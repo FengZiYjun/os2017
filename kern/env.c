@@ -117,7 +117,7 @@ env_init(void)
 	// Set up envs array
 	// LAB 1: Your code here.
 	//size_t sizeOfEnvs = sizeof(envs)/sizeof(*envs);
-	/*
+	
 	for(size_t t = 0; t < NENV; t++){
 
 		envs[t].env_status = ENV_FREE;
@@ -128,14 +128,8 @@ env_init(void)
 		}
 	}
 	env_free_list = envs;
-	*/
-	env_free_list = NULL;
-	for(size_t i = NENV-1; i+1; --i){
-		envs[i].env_id = 0;
-		envs[i].env_status = ENV_FREE;
-		envs[i].env_link = env_free_list;
-		env_free_list = envs + i;	
-	}
+	
+	
 	// Per-CPU part of the initialization
 	env_init_percpu();
 }
@@ -393,10 +387,7 @@ env_create(uint8_t *binary, enum EnvType type)
 {
 	// LAB 1: Your code here.
 	struct Env* new_env = NULL;
-	int32_t r = env_alloc(&new_env, 0);
-	if(r != 0){
-		panic("failed in env_create.");
-	}	
+	env_alloc(&new_env, 0);	
 	load_icode(new_env, binary);
 	new_env->env_type = type;
 }
@@ -520,9 +511,9 @@ env_run(struct Env *e)
 	}
 	curenv = e;
 	curenv->env_status = ENV_RUNNING;
-	++curenv->env_runs;
+	curenv->env_runs++;
 	lcr3(PADDR(curenv->env_pgdir));
-	env_pop_tf(&curenv->env_tf);
+	env_pop_tf(&(curenv->env_tf));
 	
 	//panic("env_run not yet implemented");
 }
